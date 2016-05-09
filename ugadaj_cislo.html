@@ -1,21 +1,29 @@
 ﻿<meta chraset="utf-8">
 <script>
-	
+	var i = 0;
 	var answer = Math.floor(Math.random() * 100) + 1;
 	alert('Игра Угадайка. Я загадал число от 1 до 100. Попробуй угадать!');
-
+while(i < 5){
 	var userAnswer = parseInt(prompt('Введите число от 1 до 100: '));
-	if( (answer >= 1) && (answer <= 100) ){
+		if( (answer >= 1) && (answer <= 100) ){
 		if(answer == userAnswer){
 			alert('Поздравляю!!! У Вас редкое везение!!!');
-		} else if(answer > userAnswer){
+			alert('Вы выиграли!!!')
+			break;
+			} else if(answer > userAnswer){
 			alert('Не угадали, Вы ввели слишком маленькое число');
+			i++;
 		} else {
 			alert('Не угадали, Ваше число слишком большое');
+			i++;
 		}
-		
-	} else {
+		} else {
 		alert('Не подходит. Я же просил, введите число от 1 до 100.');
+		i++;
 	}
+}
+
+   alert('Количество Ваших попыток закончилось')
+
 
 </script>>

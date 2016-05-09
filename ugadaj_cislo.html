@@ -1,9 +1,21 @@
 ﻿<meta chraset="utf-8">
 <script>
-	var n = parseInt(prompt('Введите число: '));
-	if( (n >= 1) && (n <= 100) ){
-		alert('Подходит');
+	
+	var answer = parseInt(Math.random() * 100) + 1;
+	alert('Игра Угадайка. Я загадал число от 1 до 100. Попробуй угадать!');
+
+	var userAnswer = parseInt(prompt('Введите число от 1 до 100: '));
+	if( (answer >= 1) && (answer <= 100) ){
+		if(answer == userAnswer){
+			alert('Поздравляю!!! У Вас редкое везение!!!');
+		} else if(answer > userAnswer){
+			alert('Не угадали, Вы ввели слишком маленькое число');
+		} else {
+			alert('Не угадали, Ваше число слишком большое');
+		}
+		
 	} else {
-		alert('Не подходит');
+		alert('Не подходит. Я же просил, введите число от 1 до 100.');
 	}
+
 </script>>

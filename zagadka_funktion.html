@@ -2,63 +2,33 @@
 <script type="text/javascript">
 
 	function askQuestion (question,answer){
-		var userAnswer = prompt(question);
-
-		if(userAnswer.toLowerCase() == answer){
-			alert('Вы угадали')
-		}
-		else{
-			alert('Вы не угадали');
-		}
+		var tryCount = 2;
+		do
+		{
+			var userAnswer = prompt(question);
+			if(userAnswer.toLowerCase() == answer){
+				alert('Вы угадали')
+				return true;
+			}
+			else{
+				alert('Вы не угадали, попробуйте еще разок');
+				}
+				tryCount--;
+			}while(tryCount > 0);
+			return false;
 	}
 
-	askQuestion('Сижу верхом, не ведаю на ком: ', 'шапка')
-	askQuestion('Зимой и летом - одним цветом: ', 'ель')
-	askQuestion('Днём обручем, ночью змеёй: ', 'пояс')
+	var trueAnswerCount = 0;
+	var isTrue = askQuestion('Сижу верхом, не ведаю на ком: ', 'шапка');
+	if(isTrue)
+		trueAnswerCount++;
+	var isTrue = askQuestion('Зимой и летом - одним цветом: ', 'ель');
+	if(isTrue)
+		trueAnswerCount++;
+	var isTrue = askQuestion('Днём обручем, ночью змеёй: ', 'пояс');
+	if(isTrue)
+		trueAnswerCount++;
 
-
-	/*var sum = 0
-	var a = prompt('Сижу верхом, не ведаю на ком: ');
-	if ((a == 'шапка') || (a == 'Шапка')) {
-		alert('Верно!');
-		sum = 1
-	} else {
-		var a = prompt('А попробуй-ка еще разок: ');
-		if ((a == 'шапка') || (a == 'Шапка')) {
-		alert('Верно!');
-		sum = 1
-		} else {
-		alert('Неверно!');
-	}
-	}
-
-	var b = prompt('Зимой и летом - одним цветом: ');
-		if ((b == 'Ель') || (b == 'ель')) {
-		alert('Верно!');
-		sum = sum + 1
-	} else {
-		var b = prompt('А попробуй-ка еще разок: ');
-		if ((b == 'Ель') || (b == 'ель')) {
-		alert('Верно!');
-		sum = 1
-		} else {
-		alert('Неверно!');
-	}
-	}
-	var c= prompt('Днём обручем, ночью змеёй:');
-		if ((c == 'Пояс') || (c == 'пояс')) {
-		alert('Верно!');
-		sum = sum + 1
-	} else {
-		var c = prompt('А попробуй-ка еще разок: ');
-		if ((c == 'Пояс') || (c == 'пояс')) {
-		alert('Верно!');
-		sum = 1
-		} else {
-		alert('Неверно!');
-	}
-	}
-	alert('А на сегодня загадок у меня больше нет');
-	alert('Правильных ответов ' + sum);*/
+	alert('А на сегодня загадок у меня больше нет! Вы дали ' + trueAnswerCount + ' правильных ответов');
 
 </script>

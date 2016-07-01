@@ -35,21 +35,22 @@ function p_upm.dissector(buf, pinfo, tree)
     pinfo.cols.protocol = p_upm.name       -- in column Protocol the protocol name will be issued
 
     subtree = tree:add(p_upm, buf(0))      -- create subtree
-    subtree:add(f_cmd_code, buf(2,1))      -- start to add feld
-	subtree:add(f_cmd_code, buf(0,3))      -- start to add feld
+    subtree:add(f_hdr_flags_drct, buf(0,1))      -- start to add feld
+	subtree:add(f_hdr_flags_comcode, buf(0,2))      -- start to add feld
+	
     local cmd = buf(0,4):uint()
 	    if cmd == 0x80000000 then
 		local type_str = packettypes[buf(0,1):uint()]
      if type_str == nil then type_str = "Unknown" end
        pinfo.cols.info = "Type: " .. type_str   -- column Info the type of packet will be issued
 
---       subtree:add(f_cmd_code, 			buf(1,1))
+--       subtree:add(f_cmd_code, 		buf(1,1))
 --       subtree:add(f_hdr_flags,         buf(2,1))
---       subtree:add(f_hdr_flags_comcode, buf(3,1))
---       subtree:add(f_hdr_flags_errcode, buf(4,1))
---       subtree:add(f_payload, 			buf(5,1))
---       subtree:add(f_hdr_bool,  		buf(6,1))
---       subtree:add_le(f_pl_len, 		buf(7,4))     -- feld lengh in Little Endian
+--       subtree:add(f_hdr_flags_comcode, buf(2,1))
+--       subtree:add(f_hdr_flags_errcode, buf(2,1))
+--       subtree:add(f_payload, 		buf(2,1))
+--       subtree:add(f_hdr_bool,  		buf(2,1))
+--       subtree:add_le(f_pl_len, 		buf(4,4))     -- feld lengh in Little Endian
 
        local pl_len = buf(8,4):le_uint()
        subtree:add(f_payload, buf(8,pl_len))  -- data

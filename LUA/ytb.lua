@@ -72,7 +72,11 @@ local function DefineAndRegistervGATEdissector()
 		elseif uiType == 1 then
 			local uiResult = oTvbData(3, 1):uint()
 			oSubtreeMessage:add(oTvbData(3, 1), string.format('Result: %d', uiResult))
+		end
 	end
+	
+end
+
 	
 	
 	

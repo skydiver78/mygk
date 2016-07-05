@@ -103,7 +103,7 @@ local command_code = {
 -- Registration protocol log
 p_upm.fields = { f_cmd_code,     		f_hdr_flags,		f_hdr_flags_comcode,
                  f_hdr_flags_errcode,	f_hdr_bool,        	f_pl_len,           
-				 f_hdr_flags_drct,		f_payload }
+				 f_hdr_flags_drct,		f_payload, 			command_code}
 
 -- function dissector for upm protocol
 function p_upm.dissector(buf, pinfo, tree)

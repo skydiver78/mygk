@@ -16,18 +16,6 @@ local function DefineAndRegistervGATEdissector()
 		if oTvbData:len() < 3 then 
 			return
 		end
-
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 	local uiVersion = oTvbData(0, 1):uint()
 	local uiType =    oTvbData(1, 1):uint()
@@ -41,6 +29,7 @@ local function DefineAndRegistervGATEdissector()
 	
 	local tType = {[0]='request', [1]='response'}
 	local tCommand = {[1]='ping', [2]='date',[3]='reverse',[4]='download'}
+	local tResult = {[0]='fail', [1]='success'}
 	
 	local sType = tType[uiType]
 	local sCommand = NilToQuestionmark(tCommand[uiCommand])
@@ -69,14 +58,18 @@ local function DefineAndRegistervGATEdissector()
 			local sURL = oTvbData(4, uiLength):string()
 			oSubtreeMessage:add(oTvbData(3, 1), string.format('Length: %d', uiLength))
 			oSubtreeMessage:add(oTvbData(4, uiLength), string.format('URL: %s', sURL))
+			oPinfo.cols.info:append(' ' .. sURL)
 		elseif uiType == 1 then
 			local uiResult = oTvbData(3, 1):uint()
-			oSubtreeMessage:add(oTvbData(3, 1), string.format('Result: %d', uiResult))
+			local sResult = NilToQuestionmark(tResult[uiResult])
+			oSubtreeMessage:add(oTvbData(3, 1), string.format('Result: %d %s', uiResult, sResult))
+			oPinfo.cols.info:append(' ' .. sResult)
 		end
 	end
 	
 end
 
+tcp_table = DissectorTable.get('tcp.port')
 	
 	
 	

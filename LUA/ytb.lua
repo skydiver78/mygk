@@ -16,6 +16,7 @@ local function DefineAndRegistervGATEdissector()
 		if oTvbData:len() < 3 then 
 			return
 		end
+	end
 		
 	local uiVersion = oTvbData(0, 1):uint()
 	local uiType =    oTvbData(1, 1):uint()

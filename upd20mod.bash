@@ -48,14 +48,16 @@ load_mod()
 update()
 {
 	echo "Module $port_nr ($EP) will be updated"
+	echo "Current FW: $crnt_ver"
 	fold=`find -type d | cut -d/ -f2 | grep "20"`
-	echo "Using FW from folder $fold"
+	echo "New FW from folder $fold"
 	qec20upg $EP $fold
 }	
 
 upd_again()
 {
 port_slct
+crnt_ver=`cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version`
 update
 }
 
@@ -67,14 +69,15 @@ else
 	cd $usbstk
 			new_fw=`find -type d | cut -d/ -f2 | grep "20" | cut -c 1-5`
 	port_slct
+			crnt_ver=`cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version`
 			cur_fw=`expr $(cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version) : '\(.....\).*'`
 	if ["$cur_fw" = "$new_fw"] then	
 	load_mod 
 	update
-	elif
+	else
 	echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
 	exit 2
-	fi
+fi
 
 echo "Would you like to update another module? (y/n)"
 	read answ

@@ -56,9 +56,15 @@ update()
 
 upd_again()
 {
-port_slct
-crnt_ver=`cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version`
-update
+	port_slct
+		crnt_ver=`cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version`
+		cur_fw=`expr $(cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version) : '\(.....\).*'`
+	if [ "$cur_fw" == "$new_fw" ] ; then	
+		update
+		else
+		echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
+		exit 2
+	fi
 }
 
 if [ "`mount | grep "/dev/.*/ramdisk/usb/" | cut -d " " -f 3`" == "" ] ; then
@@ -67,22 +73,28 @@ else
 	echo "USB stick was recognized"
 	usbstk=`mount | grep "/dev/.*/ramdisk/usb/" | cut -d " " -f 3`
 	cd $usbstk
+		port_slct
 			new_fw=`find -type d | cut -d/ -f2 | grep "20" | cut -c 1-5`
-	port_slct
 			crnt_ver=`cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version`
 			cur_fw=`expr $(cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version) : '\(.....\).*'`
-	if ["$cur_fw" = "$new_fw"] then	
-	load_mod 
-	update
+#	echo "crnt_ver=$crnt_ver"
+#	echo "cur_fw=$cur_fw"
+#	echo "new_fw=$new_fw"
+	if [ "$cur_fw" = "$new_fw" ] ; then	
+		load_mod 
+		update
 	else
-	echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
-	exit 2
+		echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
+		exit 2
+	fi
 fi
 
-echo "Would you like to update another module? (y/n)"
+while :
+do
+	echo "Would you like to update another module? (y/n)"
 	read answ
 	case $answ in
-	Y|y 
+	Y|y) 
 		upd_again "OK, lets do it again!";;
 	[Yy][Ee][Ss]) 
 		upd_again "OK, lets do it again!";;
@@ -90,4 +102,5 @@ echo "Would you like to update another module? (y/n)"
 	[Nn][Oo]) exit ;;
 	*) echo "Invalid command"
 	esac
+done
 fi

@@ -1,11 +1,7 @@
 #!/bin/sh
 
-if [ "`mount | grep "/dev/.*/ramdisk/usb/" | cut -d " " -f 3`" == "" ] ; then
-	echo "No USB stick was recognized"
-else
-	echo "USB stick was recognized"
-	usbstk=`mount | grep "/dev/.*/ramdisk/usb/" | cut -d " " -f 3`
-	cd $usbstk
+port_slct()
+{
 	echo "Please enter the module/port number for update <port_nr: 0 - 15>:"
 	read port_nr
 	case $port_nr in
@@ -37,16 +33,53 @@ else
 		 1|5|9|13) EP=2-1.1 ;;
 		2|6|10|14) EP=2-1.7 ;;
 		3|7|11|15) EP=2-1.6 ;;
+		cur_fw=`expr $(cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version) : '\(.....\).*'`
 	esac
-	if
-	
+}
+
+load_mod()
+{
+	rmmod option
+	rmmod usb_wwan
+	rmmod umtsquec
+	insmod usb_wwan.ko
+	insmod option.ko
+}		
+
+update()
+{
 	echo "Module $port_nr ($EP) will be updated"
-		rmmod option
-		rmmod usb_wwan
-		rmmod umtsquec
-		insmod usb_wwan.ko
-		insmod option.ko
 	fold=`find -type d | cut -d/ -f2 | grep "20"`
 	echo "Using FW from folder $fold"
 	qec20upg $EP $fold
+}	
+
+if [ "`mount | grep "/dev/.*/ramdisk/usb/" | cut -d " " -f 3`" == "" ] ; then
+	echo "No USB stick was recognized"
+else
+	echo "USB stick was recognized"
+	usbstk=`mount | grep "/dev/.*/ramdisk/usb/" | cut -d " " -f 3`
+	cd $usbstk
+	new_fw=`find -type d | cut -d/ -f2 | grep "20" | cut -c 1-5`
+	port_slct
+
+	if ["$cur_fw" = "$new_fw"] then	
+	load_mod 
+	update
+	elif
+	echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
+	exit 2
+	fi
+
+echo "Would you like to update another module? (y/n)"
+	read answ
+	case $answ in
+	Y|y 
+		port_slct "OK, lets do it again!";;
+	[Yy][Ee][Ss]) 
+		port_slct "OK, lets do it again!";;
+	N|n) exit ;;
+	[Nn][Oo]) exit ;;
+	*) echo "Invalid command"
+	esac
 fi

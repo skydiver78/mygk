@@ -33,7 +33,6 @@ port_slct()
 		 1|5|9|13) EP=2-1.1 ;;
 		2|6|10|14) EP=2-1.7 ;;
 		3|7|11|15) EP=2-1.6 ;;
-		cur_fw=`expr $(cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version) : '\(.....\).*'`
 	esac
 }
 
@@ -54,15 +53,21 @@ update()
 	qec20upg $EP $fold
 }	
 
+upd_again()
+{
+port_slct
+update
+}
+
 if [ "`mount | grep "/dev/.*/ramdisk/usb/" | cut -d " " -f 3`" == "" ] ; then
 	echo "No USB stick was recognized"
 else
 	echo "USB stick was recognized"
 	usbstk=`mount | grep "/dev/.*/ramdisk/usb/" | cut -d " " -f 3`
 	cd $usbstk
-	new_fw=`find -type d | cut -d/ -f2 | grep "20" | cut -c 1-5`
+			new_fw=`find -type d | cut -d/ -f2 | grep "20" | cut -c 1-5`
 	port_slct
-
+			cur_fw=`expr $(cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version) : '\(.....\).*'`
 	if ["$cur_fw" = "$new_fw"] then	
 	load_mod 
 	update
@@ -75,9 +80,9 @@ echo "Would you like to update another module? (y/n)"
 	read answ
 	case $answ in
 	Y|y 
-		port_slct "OK, lets do it again!";;
+		upd_again "OK, lets do it again!";;
 	[Yy][Ee][Ss]) 
-		port_slct "OK, lets do it again!";;
+		upd_again "OK, lets do it again!";;
 	N|n) exit ;;
 	[Nn][Oo]) exit ;;
 	*) echo "Invalid command"

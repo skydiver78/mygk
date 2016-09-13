@@ -59,6 +59,14 @@ load_mod()
 	fi
 }		
 
+tty_proof()
+{
+	ttyusb=`ls /sys/bus/usb/devices/$EP/$EP\:1.0 | grep "ttyUSB*"` 
+	if [ -z $ttyusb ] ; then
+	echo "The ttyUSB device cannot be found. Please check the *.ko files"
+	exit 2
+}
+
 update()
 {
 	count=0
@@ -75,7 +83,7 @@ update()
 			echo "Current FW: $crnt_ver"
 			fold=`find -type d | cut -d/ -f2 | grep "20"`
 			echo "New FW from folder $fold"
-			sleep 30
+			sleep 20
 		    /boot/quc20upg $EP $fold
 			echo 0 > /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/poff
 			echo 4711 > /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/force_mode
@@ -107,7 +115,7 @@ upd_again()
 		update
 		else
 		echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
-		exit 2
+		exit 3
 	fi
 }
 
@@ -125,12 +133,13 @@ else
 	cur_fw=`expr $(cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version) : '\(.......\).*'`
 
 	if [ "$cur_fw" = "$new_fw" ] ; then	
-#		load_mod 
+		load_mod 
+		tty_proof
 		update
 #		/boot/xgact
 	else
 		echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
-		exit 2
+		exit 4
 	fi
 fi
 

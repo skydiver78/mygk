@@ -112,7 +112,7 @@ update1()
 			echo "Current FW: $crnt_ver"
 			fold=`find -type d | cut -d/ -f2 | grep "20"`
 			tty_proof
-			#/boot/quc20upg $EP $fold
+			/boot/quc20upg $EP $fold
 			echo "Done"
 }	
 

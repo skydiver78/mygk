@@ -43,28 +43,42 @@ port_slct()
 
 load_mod()
 {
-	if [ -f ./usb_wwan.ko -a -f ./option.ko ] ; then
- 	  rmmod option
-	  rmmod usb_wwan
-	  insmod usb_wwan.ko
-  	  insmod option.ko
-	elif [ -f /boot/usb_wwan.ko -a -f /boot/option.ko ] ; then
- 	  rmmod option
-	  rmmod usb_wwan
+ 	if [ -f /boot/usb_wwan.ko -a -f /boot/option.ko ] ; then
+ 	  rmmod option.ko
+#	  sleep 5
+	  rmmod usb_wwan.ko
+#	  sleep 5
 	  insmod /boot/usb_wwan.ko
+#	  sleep 5
   	  insmod /boot/option.ko
+# 	  sleep 5
 	else
 	  echo "usb_wwan.ko and/or option.ko not found"
 	  exit 1  
 	fi
 }		
 
+proof_ko()
+{
+	optn_ko=`lsmod | grep ^option | cut -d " " -f 2` 
+	usb_wwan_ko=`lsmod | grep usb_wwan | cut -d " " -f 2` 
+	if [ "$optn_ko" != "20112" ] ; then	
+		echo "The option.ko file was not loaded!"
+		exit 2
+	fi
+	if [ "$usb_wwan_ko" != "6380" ] ; then	
+		echo "The usb_wwan.ko file was not loaded!"
+		exit 3
+	fi
+}
+
 tty_proof()
 {
 	ttyusb=`ls /sys/bus/usb/devices/$EP/$EP\:1.0 | grep "ttyUSB*"` 
 	if [ -z $ttyusb ] ; then
-	echo "The ttyUSB device cannot be found. Please check the *.ko files"
-	exit 2
+		echo "The ttyUSB device cannot be found. Please check the *.ko files"
+		exit 4
+	fi
 }
 
 update()
@@ -84,6 +98,7 @@ update()
 			fold=`find -type d | cut -d/ -f2 | grep "20"`
 			echo "New FW from folder $fold"
 			sleep 20
+			tty_proof
 		    /boot/quc20upg $EP $fold
 			echo 0 > /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/poff
 			echo 4711 > /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/force_mode
@@ -102,6 +117,16 @@ update()
 	done
 }	
 
+update1()
+{
+			echo "Module $port_nr ($EP) will be updated"
+			echo "Current FW: $crnt_ver"
+			fold=`find -type d | cut -d/ -f2 | grep "20"`
+			tty_proof
+			/boot/quc20upg $EP $fold
+			echo "Done"
+}	
+
 upd_again()
 {
 	echo "OK, I´ll do it for you again!"
@@ -112,10 +137,10 @@ upd_again()
 	cur_fw=`expr $(cat /proc/sys/vendor/teles/xgate/ctrl/c$port_nr/fw_Version) : '\(.......\).*'`
 
 	if [ "$cur_fw" == "$new_fw" ] ; then	
-		update
+		update1
 		else
 		echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
-		exit 3
+		exit 5
 	fi
 }
 
@@ -134,12 +159,12 @@ else
 
 	if [ "$cur_fw" = "$new_fw" ] ; then	
 		load_mod 
-		tty_proof
-		update
+		proof_ko
+#		update1
 #		/boot/xgact
 	else
 		echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
-		exit 4
+		exit 6
 	fi
 fi
 

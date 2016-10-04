@@ -43,34 +43,23 @@ port_slct()
 
 load_mod()
 {
- 	if [ -f /boot/usb_wwan.ko -a -f /boot/option.ko ] ; then
- 	  rmmod option.ko
-#	  sleep 5
-	  rmmod usb_wwan.ko
-#	  sleep 5
-	  insmod /boot/usb_wwan.ko
-#	  sleep 5
-  	  insmod /boot/option.ko
-# 	  sleep 5
-	else
-	  echo "usb_wwan.ko and/or option.ko not found"
-	  exit 1  
+ 	if [ ! -f /boot/usb_wwan.ko -a -f /boot/option.ko ] ; then
+		echo "usb_wwan.ko and/or option.ko not found"
+		exit 1
 	fi
-}		
-
-proof_ko()
-{
+	
 	optn_ko=`lsmod | grep ^option | cut -d " " -f 2` 
 	usb_wwan_ko=`lsmod | grep usb_wwan | cut -d " " -f 2` 
+	
 	if [ "$optn_ko" != "20112" ] ; then	
-		echo "The option.ko file was not loaded!"
-		exit 2
+		rmmod option.ko
+			if [ "$usb_wwan_ko" != "6380" ] ; then	
+				rmmod usb_wwan.ko
+				insmod /boot/usb_wwan.ko
+				insmod /boot/option.ko
+			fi
 	fi
-	if [ "$usb_wwan_ko" != "6380" ] ; then	
-		echo "The usb_wwan.ko file was not loaded!"
-		exit 3
-	fi
-}
+}		
 
 tty_proof()
 {
@@ -123,7 +112,7 @@ update1()
 			echo "Current FW: $crnt_ver"
 			fold=`find -type d | cut -d/ -f2 | grep "20"`
 			tty_proof
-			/boot/quc20upg $EP $fold
+			#/boot/quc20upg $EP $fold
 			echo "Done"
 }	
 
@@ -159,8 +148,7 @@ else
 
 	if [ "$cur_fw" = "$new_fw" ] ; then	
 		load_mod 
-		proof_ko
-#		update1
+		update1
 #		/boot/xgact
 	else
 		echo "You try to update the module with wrong firmware!!! Please check the firmware on the usb stick and the current module version"
